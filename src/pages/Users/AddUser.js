@@ -2,22 +2,29 @@ import { React, useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { Form, Input, Button, Select, message, Card, Row, Col } from "antd";
 import { createUser, updateUser, getUserDetails } from "../../apis/user";
+import { getAllRoles } from "../../apis/role";
 
 function AddUser({ isEditable = false }) {
     const [form] = Form.useForm();
 
     const history = useHistory();
     const { applicationUserId } = useParams();
+    const [roles, setRoles] = useState([]);
     useEffect(() => {
         console.log("applicationUserId", applicationUserId)
+        console.log("isEditable", isEditable  )
+        getAllRoles().then(response => {
+            setRoles(response.data);
+        }).catch(err => {
+            message.error("Failed to fetch roles");
+        });
         if (isEditable && applicationUserId) {
             // Fetch the user details from the API
             getUserDetails(applicationUserId).then(response => {
-                console.log("data", response)
-                const roleIdsString = response.data.applicationUserRoleViewModel.map(role => role.applicationRoleId).join(',');
+                const userRoleNames = response.data.applicationUserRoleViewModel.map(userRole => userRole.roleName);
                 form.setFieldsValue({
                     ...response.data,
-                    roleIds: roleIdsString
+                    roleNames: userRoleNames
                 });
             }).catch(err => {
                 message.error("Failed to fetch user details");
@@ -26,9 +33,13 @@ function AddUser({ isEditable = false }) {
     }, [isEditable, applicationUserId, form]);
     const handleOk = () => {// Get the user id from the URL params
         form.validateFields().then((values) => {
-            const roleIds = values.roleIds.split(',').map(roleId => parseInt(roleId.trim(), 10));
-            const validRoleIds = roleIds.filter(roleId => !isNaN(roleId));
-            const updatedUserData = { ...values, roleIds: validRoleIds };
+            // const roleIds = values.roleIds.split(',').map(roleId => parseInt(roleId.trim(), 10));
+            // const validRoleIds = roleIds.filter(roleId => !isNaN(roleId));
+            const roleIdsForUser = values.roleNames.map(roleName => {
+                const matchedRole = roles.find(role => role.roleName === roleName);
+                return matchedRole ? matchedRole.applicationRoleId : null;
+            }).filter(Boolean);
+            const updatedUserData = { ...values, roleIds: roleIdsForUser };
 
             isEditable ?
                 updateUser(applicationUserId, updatedUserData).then((response) => {
@@ -53,9 +64,8 @@ function AddUser({ isEditable = false }) {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
-            <Card style={{ maxWidth: '800px', margin: '0 auto' }}>
-                <h2 style={{ textAlign: 'center' }}>Add New User</h2>
+            <Card >
+                <h2 style={{ textAlign: 'center', fontWeight:"bolder" }}>{isEditable? "Edit User": "Add New User"}</h2>
                 <Form
                     form={form}
                     onFinish={handleOk}
@@ -91,30 +101,30 @@ function AddUser({ isEditable = false }) {
                         </Col>
                         <Col xs={24} sm={12}>
                             <Form.Item
-                                name="roleIds"
-                                label="Role Ids"
-                                rules={[
-                                    { required: true, message: 'Please enter at least one role!' },
-                                    {
-                                        pattern: /^(\d+[,]?)*$/,
-                                        message: 'Please enter valid integer values separated by commas!',
-                                    },
-                                ]}
+                                name="roleNames"
+                                label="Roles"
+                                rules={[{ required: true, message: 'Please select at least one role!' }]}
                             >
-                                <Input style={{ width: '100%' }} placeholder="Enter comma-separated role IDs" />
+                                <Select mode="multiple" style={{ width: '100%' }} placeholder="Select roles">
+                                    {roles.map(role => (
+                                        <Select.Option key={role.applicationRoleId} value={role.roleName}>
+                                            {role.roleName}
+                                        </Select.Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
                         </Col>
 
                     </Row>
                     {/* ... [continue with the rest of your Form.Items in a similar manner] */}
-                    <Form.Item style={{ textAlign: 'center' }}>
-                        <Button type="primary" htmlType="submit">
+                    <Form.Item style={{ textAlign: "end", paddingTop:"2rem" }}>
+                        <Button style={{width: "40%"}} type="primary" htmlType="submit">
                             Submit
                         </Button>
                     </Form.Item>
                 </Form>
             </Card>
-        </div>
+
     );
 }
 
