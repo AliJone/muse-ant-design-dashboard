@@ -156,7 +156,7 @@ function ViewMake({permissions = permissionsProblem}) {
         return (
           dataSource.length >= 1 ? (
             <Popconfirm
-              title="Sure to delete?"
+              title="Delete this item?"
               onConfirm={() => handleDelete(record)}
             >
               <a>Delete</a>
