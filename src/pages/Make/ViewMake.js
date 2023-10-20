@@ -16,7 +16,7 @@ import {
   Spin
 } from "antd";
 
-import { getAllMakes } from "../../apis/make";
+import { getAllMakes, DeleteMake } from "../../apis/make";
 import { useHistory } from "react-router-dom";
 import UserContext from "../../context/UserContext";
 
@@ -103,6 +103,16 @@ function ViewMake({permissions = permissionsProblem}) {
   const edit = (record) => {
     history.push(`/edit-make/${record.makeId}`);
   };
+  const handleDelete = (record) => {
+    DeleteMake(record.makeId, false).then((response) => {
+      if (!response.error) {
+        success("Make deleted successfully");
+        FetchData();
+      } else {
+        error(response.data);
+      }
+    });
+  };
 
   const onChangeTableFilter = (e) => {
     if (e.target.value === "all") {
@@ -135,6 +145,23 @@ function ViewMake({permissions = permissionsProblem}) {
             Edit
           </Typography.Link>
         );
+      },
+    },
+    permissions.canDelete &&
+    {
+      title: "Delete",
+      dataIndex: "Delete",
+      render: (_, record) => {
+        // const editable = isEditing(record);
+        return (
+          dataSource.length >= 1 ? (
+            <Popconfirm
+              title="Sure to delete?"
+              onConfirm={() => handleDelete(record)}
+            >
+              <a>Delete</a>
+            </Popconfirm>
+          ) : null);
       },
     },
   ].filter(Boolean);

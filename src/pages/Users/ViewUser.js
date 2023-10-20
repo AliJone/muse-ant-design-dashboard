@@ -186,11 +186,7 @@ function ViewUser({permissions = permissionsProblem}) {
     { title: "Phone Number", dataIndex: "phoneNumber", key: "phoneNumber" },
 
     {
-      title: "Active", dataIndex: "isActive", key: "isActive", render: (isActive) => isActive ? <Button style={{ width: "5rem" }} type="primary">
-        Active
-      </Button> : <Button style={{ width: "5rem" }} type="danger">
-        InActive
-      </Button>
+      title: "Active", dataIndex: "isActive", key: "isActive", render: (isActive) => isActive ? <>Active</> : <>Inactive</>
     },
 
     permissions?.canEdit &&
