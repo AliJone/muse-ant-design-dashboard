@@ -57,3 +57,20 @@ export const getMakeDetails = async (applicationUserId) => {
         return {error:true, data: `Error logging in: ${error}`}; 
     }
 };
+export const DeleteMake = async (makeId, status) => {
+    try {
+        const response = await apiClient.delete(`/api/Makes/${makeId}`);
+        if (response?.status === 202) {
+            return {error:false, data: response?.data};
+        } else {
+            return {error:true, data:`Unexpected status code ${response?.status}`};
+        }
+    } 
+    catch(error) {
+        if (error.response) {
+            return {error:true, data: `Error: ${error.response?.data}`};
+        } else {
+            return {error:true, data: `Error updating status: ${error}`};
+        }
+    }
+};

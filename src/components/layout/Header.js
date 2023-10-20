@@ -278,17 +278,17 @@ function Header({
               <NavLink to="/">Pages</NavLink>
             </Breadcrumb.Item>
             <Breadcrumb.Item style={{ textTransform: "capitalize" }}>
-            {(subName.replace("/", " ")).replace("-", " ")}
+            {subName.split("/")[0].replace("-", " ")}
             </Breadcrumb.Item>
           </Breadcrumb>
-          <div className="ant-page-header-heading">
+          {/* <div className="ant-page-header-heading">
             <span
               className="ant-page-header-heading-title"
               style={{ textTransform: "capitalize" }}
             >
               {(subName.replace("/", " ")).replace("-", " ")}
             </span>
-          </div>
+          </div> */}
         </Col>
         <Col span={24} md={18} className="header-control">
           {/* <Badge size="small" count={4}>
