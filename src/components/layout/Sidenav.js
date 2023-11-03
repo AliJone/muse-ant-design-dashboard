@@ -246,6 +246,47 @@ function Sidenav({ color }) {
           </NavLink>
         </Menu.Item>}
 
+        {hasPermission("Models") && <Menu.Item key="5">
+          <NavLink to="/models">
+            <span
+              className="icon"
+              style={{
+                background: page === "tables" ? color : "",
+              }}
+            >
+              {rtl}
+            </span>
+            <span className="label">Model</span>
+          </NavLink>
+        </Menu.Item>}
+
+        {hasPermission("Parameters") && <Menu.Item key="6">
+          <NavLink to="/parameters">
+            <span
+              className="icon"
+              style={{
+                background: page === "tables" ? color : "",
+              }}
+            >
+              {rtl}
+            </span>
+            <span className="label">Parameter</span>
+          </NavLink>
+        </Menu.Item>}
+
+        {hasPermission("ParameterTypes") && <Menu.Item key="6">
+          <NavLink to="/parameterTypes">
+            <span
+              className="icon"
+              style={{
+                background: page === "tables" ? color : "",
+              }}
+            >
+              {rtl}
+            </span>
+            <span className="label">Parameter Type</span>
+          </NavLink>
+        </Menu.Item>}
 
 
         </>}
