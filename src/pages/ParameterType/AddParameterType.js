@@ -11,7 +11,11 @@ function AddParameterType({ isEditable = false }) {
     useEffect(() => {
         if (isEditable && parameterTypeId) {
             getParameterTypeDetails(parameterTypeId).then(response => {
-                form.setFieldsValue(response.data);
+                if (!response.error) {
+                    form.setFieldsValue(response.data);
+                } else {
+                    message.error(response.data);
+                }
             }).catch(err => {
                 message.error("Failed to fetch parameter type details");
             });
