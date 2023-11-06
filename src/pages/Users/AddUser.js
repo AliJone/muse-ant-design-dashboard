@@ -1,6 +1,6 @@
 import { React, useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Form, Input, Button, Select, message, Card, Row, Col } from "antd";
+import { Form,  Button, Select, message, Input, Card, Row, Col } from "antd";
 import { createUser, updateUser, getUserDetails } from "../../apis/user";
 import { getAllRoles } from "../../apis/role";
 import { checkPermission } from "../../apis/authentication";

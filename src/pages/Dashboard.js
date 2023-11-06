@@ -10,7 +10,7 @@ import {
   Tooltip,
   Progress,
   Upload,
-  message,
+  message, Input,
   Button,
   Timeline,
   Radio,

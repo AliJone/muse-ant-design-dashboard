@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Form, Input, Button, message, Card, Row, Col, Select } from "antd";
+import { Form, Button, message, Input, Card, Row, Col, Select } from "antd";
 import { createModel, updateModel, getModelDetails } from "../../apis/model";
 import { getAllMakes } from "../../apis/make";
 import { getAllParameters } from "../../apis/parameter";

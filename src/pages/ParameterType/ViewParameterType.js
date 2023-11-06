@@ -10,7 +10,8 @@ import {
   Form,
   Spin,
   Button,
-  message
+  message,
+  Input
 } from "antd";
 import { getAllParameterTypes, deleteParameterType } from "../../apis/parameterType";
 import { useHistory } from "react-router-dom";
@@ -29,6 +30,33 @@ function ViewParameterType({ permissions = permissionsProblem }) {
   const [loading, setLoading] = useState(false);
   const history = useHistory();
   const [dataSource, setDataSource] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
+  // Function to handle search
+  const handleSearch = (searchValue) => {
+    setSearchText(searchValue);
+    const filtered = dataSource.filter(entry =>
+      columns.some(column => {
+        const cellValue = entry[column.dataIndex];
+        let cellValueString;
+
+        // Convert different data types to string
+        if (cellValue != null) { // checks for both null and undefined
+          if (cellValue instanceof Date) {
+            // Format dates as you see fit
+            cellValueString = cellValue.toLocaleDateString();
+          } else {
+            cellValueString = cellValue.toString();
+          }
+        }
+
+        // Perform case-insensitive comparison
+        return cellValueString && cellValueString.toLowerCase().includes(searchValue.toLowerCase());
+      })
+    );
+    setFilteredData(filtered);
+  };
 
   const error = (msg) => {
     messageApi.open({
@@ -48,6 +76,7 @@ function ViewParameterType({ permissions = permissionsProblem }) {
     getAllParameterTypes().then((response) => {
       if (!response.error) {
         setDataSource(response.data);
+        setFilteredData(response.data);
       } else {
         error(response.data);
       }
@@ -83,7 +112,10 @@ function ViewParameterType({ permissions = permissionsProblem }) {
       dataIndex: "edit",
       render: (_, record) => (
         <Typography.Link onClick={() => edit(record)}>
-          Edit
+
+          <Button type="dashed" >
+            Edit
+          </Button>
         </Typography.Link>
       ),
     },
@@ -92,7 +124,9 @@ function ViewParameterType({ permissions = permissionsProblem }) {
       dataIndex: "delete",
       render: (_, record) => (
         <Popconfirm title="Delete this item?" onConfirm={() => handleDelete(record)}>
-          <a>Delete</a>
+          <a><Button type="primary" danger>
+            Delete
+          </Button></a>
         </Popconfirm>
       ),
     },
@@ -113,11 +147,23 @@ function ViewParameterType({ permissions = permissionsProblem }) {
             title="Parameter Types"
             extra={
               <>
-                {permissions.canAdd && (
-                  <Button type="primary" onClick={handleAddParameterType}>
-                    Add Parameter Type
-                  </Button>
-                )}
+                <div style={{ display: 'flex', gap: '2rem' }}>
+                  {permissions.canView && (
+                    <Input
+                      placeholder="Search..."
+                      value={searchText}
+                      onChange={e => handleSearch(e.target.value)}
+                      style={{ marginBottom: 8, display: 'block', }}
+                    />
+                  )
+                  }
+                  {permissions.canAdd && (
+                    <Button type="primary" onClick={handleAddParameterType}>
+                      Add Parameter Type
+                    </Button>
+                  )}
+                </div>
+
               </>
             }
           >
@@ -128,10 +174,11 @@ function ViewParameterType({ permissions = permissionsProblem }) {
                 </div>
               ) : (
                 <Form form={form} component={false}>
+
                   <Table
                     columns={columns}
-                    dataSource={dataSource}
-                    pagination={false}
+                    dataSource={filteredData}
+                    pagination={{ pageSize: 10 }}
                     className="ant-border-space"
                     rowClassName="editable-row"
                   />

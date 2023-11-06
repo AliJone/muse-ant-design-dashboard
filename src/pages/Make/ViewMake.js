@@ -11,7 +11,7 @@ import {
   Form,
   Input,
   Modal,
-  message,
+  message, 
   Select,
   Spin
 } from "antd";
@@ -65,6 +65,34 @@ function ViewMake({permissions = permissionsProblem}) {
 
   const [originalDataSource, setOriginalDataSource] = useState([]);
   const [dataSource, setDataSource] = useState([]);
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
+  // Function to handle search
+  const handleSearch = (searchValue) => {
+    setSearchText(searchValue);
+    const filtered = dataSource.filter(entry =>
+      columns.some(column => {
+        const cellValue = entry[column.dataIndex];
+        let cellValueString;
+
+        // Convert different data types to string
+        if (cellValue != null) { // checks for both null and undefined
+          if (cellValue instanceof Date) {
+            // Format dates as you see fit
+            cellValueString = cellValue.toLocaleDateString();
+          } else {
+            cellValueString = cellValue.toString();
+          }
+        }
+
+        // Perform case-insensitive comparison
+        return cellValueString && cellValueString.toLowerCase().includes(searchValue.toLowerCase());
+      })
+    );
+    setFilteredData(filtered);
+  };
+
 
   // const { permission } = useContext(UserContext);
 
@@ -87,6 +115,7 @@ function ViewMake({permissions = permissionsProblem}) {
       if (!response.error) {
         // console.log(response);
         setDataSource(response.data);
+        setFilteredData(response.data);
         setOriginalDataSource(response.data);
       } else {
         error(response.data);
@@ -138,11 +167,13 @@ function ViewMake({permissions = permissionsProblem}) {
       dataIndex: "Edit",
       render: (_, record) => {
         return (
-          <Typography.Link
+         <Typography.Link
             disabled={editingKey !== ""}
             onClick={() => edit(record)}
           >
+            <Button type="dashed" >
             Edit
+          </Button>
           </Typography.Link>
         );
       },
@@ -159,7 +190,9 @@ function ViewMake({permissions = permissionsProblem}) {
               title="Delete this item?"
               onConfirm={() => handleDelete(record)}
             >
-              <a>Delete</a>
+              <a><Button type="primary" danger>
+            Delete
+          </Button></a>
             </Popconfirm>
           ) : null);
       },
@@ -183,18 +216,22 @@ function ViewMake({permissions = permissionsProblem}) {
               title="Makes"
               extra={
                 <>
+                <div style={{ display: 'flex', gap: '2rem' }}>
+                  {permissions.canView && (
+                    <Input
+                      placeholder="Search..."
+                      value={searchText}
+                      onChange={e => handleSearch(e.target.value)}
+                      style={{ marginBottom: 8, display: 'block', }}
+                    />
+                  )
+                  }
                   {permissions?.canAdd && <span style={{ marginRight: "20px" }}>
                     <Button type="primary" onClick={handleAddUser}>
                       Add Make
                     </Button>
                   </span>}
-                  <Radio.Group
-                    onChange={onChangeTableFilter}
-                    defaultValue="all"
-                  >
-                    <Radio.Button value="all">All</Radio.Button>
-                    <Radio.Button value="active">ACTIVE</Radio.Button>
-                  </Radio.Group>
+                </div>
                 </>
               }
             >
@@ -207,8 +244,8 @@ function ViewMake({permissions = permissionsProblem}) {
                   <Form form={form} component={false}>
                     <Table
                       columns={columns}
-                      dataSource={dataSource}
-                      pagination={false}
+                      dataSource={filteredData}
+                      pagination={{ pageSize: 10 }}
                       className="ant-border-space usertable"
                       rowClassName="editable-row"
                     />
