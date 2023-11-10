@@ -246,7 +246,7 @@ function Sidenav({ color }) {
           </NavLink>
         </Menu.Item>}
 
-        {hasPermission("Models") && <Menu.Item key="5">
+        {/* {hasPermission("Models") && <Menu.Item key="5">
           <NavLink to="/models">
             <span
               className="icon"
@@ -286,7 +286,7 @@ function Sidenav({ color }) {
             </span>
             <span className="label">Parameter Type</span>
           </NavLink>
-        </Menu.Item>}
+        </Menu.Item>} */}
 
 
         </>}

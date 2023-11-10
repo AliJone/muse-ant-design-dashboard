@@ -291,7 +291,7 @@ function ViewUser({permissions = permissionsProblem}) {
                     />
                   )
                   }
-                  {permissions?.canAdd && <span style={{ marginRight: "20px" }}>
+                  {permissions?.canAdd && <span>
                     <Button type="primary" onClick={handleAddUser}>
                       Add User
                     </Button>

@@ -419,6 +419,13 @@ function Header({
               </div>
             </div>
           </Drawer> */}
+          <Button
+            type="link"
+            className="sidebar-toggler"
+            onClick={() => onPress()}
+          >
+            {toggler}
+          </Button>
           <div onClick={() => {
                         handleLogout();
                       }} style={{cursor: "pointer"}} className="btn-sign-in" >
